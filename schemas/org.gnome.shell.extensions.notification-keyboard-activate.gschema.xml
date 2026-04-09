@@ -1,0 +1,12 @@
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema id="org.gnome.shell.extensions.notification-keyboard-activate"
+      path="/org/gnome/shell/extensions/notification-keyboard-activate/">
+
+    <key type="b" name="auto-focus">
+      <default>true</default>
+      <summary>Auto-focus notification banners</summary>
+      <description>When enabled, notification banners are automatically keyboard-focused when they appear. Press Enter to activate immediately. When disabled, press Super+N first to focus, then Enter to activate.</description>
+    </key>
+
+  </schema>
+</schemalist>

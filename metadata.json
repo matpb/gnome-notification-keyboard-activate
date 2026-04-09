@@ -1,0 +1,9 @@
+{
+  "uuid": "notification-keyboard-activate@matpb",
+  "name": "Notification Keyboard Activate",
+  "description": "Enables keyboard activation of notification banners. Press Enter to activate the default action, Tab to navigate action buttons, Escape to dismiss. Optionally auto-focuses banners when they appear.",
+  "shell-version": ["46"],
+  "version": 1,
+  "url": "https://github.com/matpb/gnome-notification-keyboard-activate",
+  "settings-schema": "org.gnome.shell.extensions.notification-keyboard-activate"
+}
