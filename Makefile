@@ -1,7 +1,8 @@
 UUID = notification-keyboard-activate@matpb
 INSTALL_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
+ZIP = $(UUID).shell-extension.zip
 
-.PHONY: install uninstall schemas
+.PHONY: install uninstall schemas zip clean
 
 schemas:
 	glib-compile-schemas schemas/
@@ -15,3 +16,12 @@ install: schemas
 uninstall:
 	rm -rf $(INSTALL_DIR)
 	@echo "Uninstalled. Restart GNOME Shell to complete removal."
+
+zip: schemas
+	rm -f $(ZIP)
+	zip -r $(ZIP) extension.js prefs.js metadata.json LICENSE \
+		schemas/*.xml schemas/*.compiled
+	@echo "Built $(ZIP) — upload to https://extensions.gnome.org/upload/"
+
+clean:
+	rm -f $(ZIP) schemas/gschemas.compiled

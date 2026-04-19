@@ -4,5 +4,6 @@
   "description": "Enables keyboard activation of notification banners.\n\n* Enter — activate the notification (open the app)\n* Tab — navigate to action buttons\n* Escape — dismiss (default GNOME behavior)\n* Optional auto-focus when banners appear",
   "shell-version": ["46"],
   "url": "https://github.com/matpb/gnome-notification-keyboard-activate",
-  "settings-schema": "org.gnome.shell.extensions.notification-keyboard-activate"
+  "settings-schema": "org.gnome.shell.extensions.notification-keyboard-activate",
+  "version-name": "1.0.1"
 }
