@@ -9,12 +9,15 @@ import {MessageTray} from 'resource:///org/gnome/shell/ui/messageTray.js';
 export default class NotificationKeyboardActivate extends Extension {
     _injectionManager = null;
     _keyPressHandlerId = null;
+    _bannerKeyHandlerId = 0;
+    _connectedBanner = null;
     _settings = null;
 
     enable() {
         this._settings = this.getSettings();
         this._injectionManager = new InjectionManager();
 
+        const self = this;
         const settings = this._settings;
 
         // GNOME hardcodes `banner.can_focus = false` (messageTray.js), which
@@ -35,11 +38,16 @@ export default class NotificationKeyboardActivate extends Extension {
                         // fires 'clicked' on Space before events bubble to
                         // parent widgets, so we intercept at the banner level.
                         // Space still works on action buttons inside the banner.
-                        this._banner.connect('key-press-event', (_actor, event) => {
-                            if (event.get_key_symbol() === Clutter.KEY_space)
-                                return Clutter.EVENT_STOP;
-                            return Clutter.EVENT_PROPAGATE;
-                        });
+                        self._disconnectBanner();
+                        self._connectedBanner = this._banner;
+                        self._bannerKeyHandlerId = this._banner.connect(
+                            'key-press-event',
+                            (_actor, event) => {
+                                if (event.get_key_symbol() === Clutter.KEY_space)
+                                    return Clutter.EVENT_STOP;
+                                return Clutter.EVENT_PROPAGATE;
+                            }
+                        );
 
                         if (settings.get_boolean('auto-focus'))
                             this._banner.grab_key_focus();
@@ -86,6 +94,8 @@ export default class NotificationKeyboardActivate extends Extension {
     }
 
     disable() {
+        this._disconnectBanner();
+
         if (this._keyPressHandlerId) {
             Main.messageTray._bannerBin.disconnect(this._keyPressHandlerId);
             this._keyPressHandlerId = null;
@@ -97,5 +107,17 @@ export default class NotificationKeyboardActivate extends Extension {
         }
 
         this._settings = null;
+    }
+
+    _disconnectBanner() {
+        if (this._connectedBanner && this._bannerKeyHandlerId) {
+            try {
+                this._connectedBanner.disconnect(this._bannerKeyHandlerId);
+            } catch {
+                // Banner already destroyed by Clutter — signal is gone with it.
+            }
+        }
+        this._connectedBanner = null;
+        this._bannerKeyHandlerId = 0;
     }
 }

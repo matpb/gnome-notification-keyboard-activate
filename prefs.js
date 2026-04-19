@@ -1,59 +1,42 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 Mathieu-Philippe Bourgeois (matpb)
 
-import Gtk from 'gi://Gtk';
+import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Gtk from 'gi://Gtk';
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class NotificationKeyboardActivatePreferences extends ExtensionPreferences {
-    getPreferencesWidget() {
+    fillPreferencesWindow(window) {
         const settings = this.getSettings();
 
-        const grid = new Gtk.Grid({
-            margin_top: 18,
-            margin_bottom: 18,
-            margin_start: 18,
-            margin_end: 18,
-            row_spacing: 12,
-            column_spacing: 18,
+        const page = new Adw.PreferencesPage();
+        window.add(page);
+
+        const behaviorGroup = new Adw.PreferencesGroup({title: 'Behavior'});
+        page.add(behaviorGroup);
+
+        const autoFocusRow = new Adw.SwitchRow({
+            title: 'Auto-focus notifications',
+            subtitle: 'Focus banners automatically when they appear. When off, press Super+N first, then Enter to activate.',
         });
+        settings.bind('auto-focus', autoFocusRow, 'active', Gio.SettingsBindFlags.DEFAULT);
+        behaviorGroup.add(autoFocusRow);
 
-        // Auto-focus toggle
-        const labelBox = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 4,
-            hexpand: true,
+        const testGroup = new Adw.PreferencesGroup({title: 'Test'});
+        page.add(testGroup);
+
+        const testRow = new Adw.ActionRow({
+            title: 'Send test notification',
+            subtitle: 'Press Enter to activate, Escape to dismiss',
         });
-
-        labelBox.append(new Gtk.Label({
-            label: 'Auto-focus notifications',
-            hexpand: true,
-            halign: Gtk.Align.START,
-        }));
-
-        const description = new Gtk.Label({
-            label: '<small>Automatically focus banners when they appear.\nWhen off, press Super+N first, then Enter to activate.</small>',
-            use_markup: true,
-            hexpand: true,
-            halign: Gtk.Align.START,
-            wrap: true,
-        });
-        description.add_css_class('dim-label');
-        labelBox.append(description);
-
-        const autoFocusSwitch = new Gtk.Switch({
+        const testButton = new Gtk.Button({
+            label: 'Send',
             valign: Gtk.Align.CENTER,
-            halign: Gtk.Align.END,
         });
-        settings.bind('auto-focus', autoFocusSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
-
-        grid.attach(labelBox, 0, 0, 1, 1);
-        grid.attach(autoFocusSwitch, 1, 0, 1, 1);
-
-        // Test notification button
-        const testButton = new Gtk.Button({label: 'Send Test Notification'});
+        testButton.add_css_class('suggested-action');
         testButton.connect('clicked', () => {
             Gio.DBus.session.call(
                 'org.freedesktop.Notifications',
@@ -77,8 +60,8 @@ export default class NotificationKeyboardActivatePreferences extends ExtensionPr
                 null
             );
         });
-        grid.attach(testButton, 0, 1, 2, 1);
-
-        return grid;
+        testRow.add_suffix(testButton);
+        testRow.activatable_widget = testButton;
+        testGroup.add(testRow);
     }
 }
