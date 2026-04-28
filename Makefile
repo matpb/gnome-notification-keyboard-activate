@@ -17,10 +17,10 @@ uninstall:
 	rm -rf $(INSTALL_DIR)
 	@echo "Uninstalled. Restart GNOME Shell to complete removal."
 
-zip: schemas
+zip:
 	rm -f $(ZIP)
 	zip -r $(ZIP) extension.js prefs.js metadata.json LICENSE \
-		schemas/*.xml schemas/*.compiled
+		schemas/*.xml
 	@echo "Built $(ZIP) — upload to https://extensions.gnome.org/upload/"
 
 clean:
